@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class HospitalRequestPanel extends JFrame {
+public class HospitalRequestPanel extends JPanel {
 
     private HospitalRequestRepository repository;
     private DefaultTableModel tableModel;
@@ -14,11 +14,7 @@ public class HospitalRequestPanel extends JFrame {
 
         repository = HospitalRequestRepositoryProvider.getRepository();
 
-        setTitle("Hospital Side - Blood Bank Management System");
-        setSize(800, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-
+        setLayout(new BorderLayout(10, 10));
 
         JLabel title = new JLabel("Hospital Blood Request");
 
@@ -59,7 +55,6 @@ public class HospitalRequestPanel extends JFrame {
         JComboBox<String> urgencyBox =
                 new JComboBox<>(urgencyOptions);
 
-
         formPanel.add(hospitalLabel);
         formPanel.add(hospitalField);
 
@@ -75,7 +70,6 @@ public class HospitalRequestPanel extends JFrame {
         formPanel.add(urgencyLabel);
         formPanel.add(urgencyBox);
 
-
         JButton submitButton =
                 new JButton("Submit Request");
 
@@ -85,23 +79,22 @@ public class HospitalRequestPanel extends JFrame {
         submitButton.addActionListener(e -> {
 
             String hospitalName =
-                    hospitalField.getText();
+                    hospitalField.getText().trim();
 
             String patientName =
-                    patientField.getText();
+                    patientField.getText().trim();
 
             String bloodGroup =
                     (String) bloodGroupBox.getSelectedItem();
 
             String units =
-                    unitsField.getText();
+                    unitsField.getText().trim();
 
             String urgency =
                     (String) urgencyBox.getSelectedItem();
 
-
             // Validate hospital name
-            if (hospitalName.trim().isEmpty()) {
+            if (hospitalName.isEmpty()) {
 
                 JOptionPane.showMessageDialog(
                         this,
@@ -111,7 +104,8 @@ public class HospitalRequestPanel extends JFrame {
                 return;
             }
 
-            if (patientName.trim().isEmpty()) {
+            // Validate patient name
+            if (patientName.isEmpty()) {
 
                 JOptionPane.showMessageDialog(
                         this,
@@ -120,7 +114,9 @@ public class HospitalRequestPanel extends JFrame {
 
                 return;
             }
-            if (units.trim().isEmpty()) {
+
+            // Validate units
+            if (units.isEmpty()) {
 
                 JOptionPane.showMessageDialog(
                         this,
@@ -130,13 +126,11 @@ public class HospitalRequestPanel extends JFrame {
                 return;
             }
 
-
             int unitCount;
 
             try {
 
-                unitCount =
-                        Integer.parseInt(units);
+                unitCount = Integer.parseInt(units);
 
             } catch (NumberFormatException ex) {
 
@@ -147,7 +141,6 @@ public class HospitalRequestPanel extends JFrame {
 
                 return;
             }
-
 
             if (unitCount <= 0) {
 
@@ -162,7 +155,6 @@ public class HospitalRequestPanel extends JFrame {
             String requestId =
                     "R" + (tableModel.getRowCount() + 1);
 
-
             // Create request
             HospitalRequest request =
                     new HospitalRequest(
@@ -174,10 +166,8 @@ public class HospitalRequestPanel extends JFrame {
                             urgency
                     );
 
-
             // Save request
             repository.save(request);
-
 
             // Add request to table
             tableModel.addRow(
@@ -192,14 +182,12 @@ public class HospitalRequestPanel extends JFrame {
                     }
             );
 
-
             JOptionPane.showMessageDialog(
                     this,
                     "Request submitted successfully!"
             );
 
-
-            // Clear form after submission
+            // Clear form
             hospitalField.setText("");
             patientField.setText("");
             unitsField.setText("");
@@ -232,14 +220,11 @@ public class HospitalRequestPanel extends JFrame {
                 "Status"
         };
 
-
         tableModel =
                 new DefaultTableModel(columns, 0);
 
-
         requestTable =
                 new JTable(tableModel);
-
 
         JScrollPane tableScrollPane =
                 new JScrollPane(requestTable);
@@ -249,16 +234,14 @@ public class HospitalRequestPanel extends JFrame {
                         new BorderLayout(20, 20)
                 );
 
-
         centerPanel.setBorder(
                 BorderFactory.createEmptyBorder(
                         30,
-                        100,
+                        50,
                         30,
-                        100
+                        50
                 )
         );
-
 
         centerPanel.add(
                 formPanel,
@@ -275,15 +258,9 @@ public class HospitalRequestPanel extends JFrame {
                 BorderLayout.SOUTH
         );
 
-
         add(
                 centerPanel,
                 BorderLayout.CENTER
         );
-    }
-    public static void main(String[] args) {
-
-        new HospitalRequestPanel().setVisible(true);
-
     }
 }

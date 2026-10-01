@@ -4,7 +4,11 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class AdminRequestPanel extends JFrame {
+import org.yourcompany.yourproject.inventory.BloodUnit;
+import org.yourcompany.yourproject.inventory.BloodStatus;
+import org.yourcompany.yourproject.inventory.InventoryManager;
+
+public class AdminRequestPanel extends JPanel {
 
     private HospitalRequestRepository repository;
     private DefaultTableModel tableModel;
@@ -15,16 +19,14 @@ public class AdminRequestPanel extends JFrame {
         // Use the SAME repository as the Hospital side
         repository = HospitalRequestRepositoryProvider.getRepository();
 
-        setTitle("Admin Side - Blood Bank Management System");
-        setSize(900, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setLayout(new BorderLayout(10, 10));
 
-        JLabel title = new JLabel("Admin Dashboard");
+        JLabel title = new JLabel("Admin - Hospital Requests");
 
         title.setFont(new Font("Arial", Font.BOLD, 24));
         title.setHorizontalAlignment(SwingConstants.CENTER);
 
+        // Low stock alert
         JPanel alertPanel = new JPanel();
         alertPanel.setLayout(
                 new BoxLayout(alertPanel, BoxLayout.Y_AXIS)
@@ -37,8 +39,21 @@ public class AdminRequestPanel extends JFrame {
                 new Font("Arial", Font.BOLD, 16)
         );
 
+        InventoryManager inventoryManager = new InventoryManager();
+
+        int oPositiveCount = 0;
+
+        for (BloodUnit unit : inventoryManager.getAllBloodUnits()) {
+
+                if (unit.getBloodGroup().name().equals("O_POSITIVE")
+                        && unit.getStatus() == BloodStatus.AVAILABLE) {
+
+                        oPositiveCount++;
+                }
+        }
+
         JLabel alertMessage =
-                new JLabel("O+ : 2 units remaining");
+                new JLabel("O+ : " + oPositiveCount + " units available");
 
         alertPanel.add(alertTitle);
         alertPanel.add(alertMessage);
@@ -54,6 +69,7 @@ public class AdminRequestPanel extends JFrame {
 
         add(topPanel, BorderLayout.NORTH);
 
+        // Request table
         String[] columns = {
                 "ID",
                 "Hospital",
@@ -75,6 +91,7 @@ public class AdminRequestPanel extends JFrame {
 
         loadRequests();
 
+        // Approve button
         JButton approveButton =
                 new JButton("Approve Request");
 
@@ -93,17 +110,14 @@ public class AdminRequestPanel extends JFrame {
                 return;
             }
 
-
             String requestId =
                     (String) tableModel.getValueAt(
                             selectedRow,
                             0
                     );
 
-
             HospitalRequest request =
                     repository.findById(requestId);
-
 
             if (request != null) {
 
@@ -124,6 +138,7 @@ public class AdminRequestPanel extends JFrame {
             }
         });
 
+        // Reject button
         JButton rejectButton =
                 new JButton("Reject Request");
 
@@ -142,17 +157,14 @@ public class AdminRequestPanel extends JFrame {
                 return;
             }
 
-
             String requestId =
                     (String) tableModel.getValueAt(
                             selectedRow,
                             0
                     );
 
-
             HospitalRequest request =
                     repository.findById(requestId);
-
 
             if (request != null) {
 
@@ -205,6 +217,7 @@ public class AdminRequestPanel extends JFrame {
                 BorderLayout.CENTER
         );
     }
+
     private void loadRequests() {
 
         tableModel.setRowCount(0);
@@ -224,11 +237,5 @@ public class AdminRequestPanel extends JFrame {
                     }
             );
         }
-    }
-
-    public static void main(String[] args) {
-
-        new AdminRequestPanel().setVisible(true);
-
     }
 }

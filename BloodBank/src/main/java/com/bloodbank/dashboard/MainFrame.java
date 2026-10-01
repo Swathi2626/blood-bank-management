@@ -6,8 +6,12 @@ import com.bloodbank.auth.LoginPanel;
 import com.bloodbank.auth.User;
 import com.bloodbank.common.Role;
 
+import org.yourcompany.yourproject.hospital.AdminRequestPanel;
+import org.yourcompany.yourproject.hospital.HospitalRequestPanel;
+
 import javax.swing.*;
 import java.awt.*;
+
 
 public class MainFrame extends JFrame {
 
@@ -54,8 +58,12 @@ public class MainFrame extends JFrame {
         );
 
         mainPanel.add(
-                new PlaceholderPanel("Blood Request — Coming Soon"),
+                new HospitalRequestPanel(),
                 "REQUESTS"
+        );
+        mainPanel.add(
+            new AdminRequestPanel(),
+            "ADMIN_REQUESTS"
         );
 
         // Add everything to the JFrame
