@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class DatabaseConnection{
 
-    private static final String URL = "jdbc:mysql://localhost:3306/bloodbank";
+    private static final String URL = "jdbc:mysql://localhost:3306/blood_bank_db";
     private static final String USER = "root";
     private static final String PASSWORD = "password"; //replace this field with your password, but don't commit it
 
