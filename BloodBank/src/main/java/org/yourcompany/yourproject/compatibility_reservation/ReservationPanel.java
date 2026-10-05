@@ -11,6 +11,7 @@ public class ReservationPanel extends JFrame {
 
     private JComboBox<String> bloodGroupBox;
     private JComboBox<BloodComponent> componentBox;
+    private JTextField patientIdField;
 
     private JLabel unitIdLabel;
     private JLabel unitGroupLabel;
@@ -38,15 +39,21 @@ public class ReservationPanel extends JFrame {
 
         // Form
         JPanel formPanel = new JPanel(
-                new GridLayout(3, 2, 10, 10)
+                new GridLayout(4, 2, 10, 10)
         );
 
         formPanel.setBorder(
                 BorderFactory.createEmptyBorder(30, 50, 20, 50)
         );
 
+        // Patient ID
+        formPanel.add(new JLabel("Patient ID:"));
+        patientIdField = new JTextField();
+        formPanel.add(patientIdField);
+
         // Blood Group
-        JLabel bloodGroupLabel = new JLabel("Recipient Blood Group:");
+        JLabel bloodGroupLabel =
+                new JLabel("Recipient Blood Group:");
 
         String[] bloodGroups = {
                 "A+", "A-", "B+", "B-",
@@ -55,15 +62,16 @@ public class ReservationPanel extends JFrame {
 
         bloodGroupBox = new JComboBox<>(bloodGroups);
 
-        // Component
-        JLabel componentLabel = new JLabel("Blood Component:");
+        formPanel.add(bloodGroupLabel);
+        formPanel.add(bloodGroupBox);
+
+        // Blood Component
+        JLabel componentLabel =
+                new JLabel("Blood Component:");
 
         componentBox = new JComboBox<>(
                 BloodComponent.values()
         );
-
-        formPanel.add(bloodGroupLabel);
-        formPanel.add(bloodGroupBox);
 
         formPanel.add(componentLabel);
         formPanel.add(componentBox);
@@ -80,39 +88,60 @@ public class ReservationPanel extends JFrame {
 
         add(formPanel, BorderLayout.CENTER);
 
-        // Unit information
+        // Reservation details
         JPanel resultPanel = new JPanel(
                 new GridLayout(4, 2, 10, 10)
         );
 
         resultPanel.setBorder(
-                BorderFactory.createTitledBorder("Reservation Details")
+                BorderFactory.createTitledBorder(
+                        "Reservation Details"
+                )
         );
 
         resultPanel.add(new JLabel("Unit ID:"));
         unitIdLabel = new JLabel("-");
-
         resultPanel.add(unitIdLabel);
 
         resultPanel.add(new JLabel("Blood Group:"));
         unitGroupLabel = new JLabel("-");
-
         resultPanel.add(unitGroupLabel);
 
         resultPanel.add(new JLabel("Component:"));
         unitComponentLabel = new JLabel("-");
-
         resultPanel.add(unitComponentLabel);
 
         resultPanel.add(new JLabel("Status:"));
         unitStatusLabel = new JLabel("-");
-
         resultPanel.add(unitStatusLabel);
 
         add(resultPanel, BorderLayout.SOUTH);
 
         // Reserve button
         reserveButton.addActionListener(e -> {
+
+            String patientIdText =
+                    patientIdField.getText().trim();
+
+            if (patientIdText.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Please enter Patient ID."
+                );
+                return;
+            }
+
+            int patientId;
+
+            try {
+                patientId = Integer.parseInt(patientIdText);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Patient ID must be a number."
+                );
+                return;
+            }
 
             String selectedGroup =
                     (String) bloodGroupBox.getSelectedItem();
@@ -131,8 +160,27 @@ public class ReservationPanel extends JFrame {
 
             if (reservedUnit != null) {
 
+                boolean saved =
+                        reservation.saveReservation(
+                                patientId,
+                                reservedUnit
+                        );
+
+                if (!saved) {
+
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Blood unit found, but reservation could not be saved."
+                    );
+
+                    reservedUnit = null;
+                    return;
+                }
+
                 unitIdLabel.setText(
-                        String.valueOf(reservedUnit.getUnitId())
+                        String.valueOf(
+                                reservedUnit.getUnitId()
+                        )
                 );
 
                 unitGroupLabel.setText(
@@ -179,29 +227,10 @@ public class ReservationPanel extends JFrame {
                 return;
             }
 
-            boolean cancelled =
-                    reservation.cancelReservation(reservedUnit);
-
-            if (cancelled) {
-
-                unitStatusLabel.setText(
-                        reservedUnit.getStatus().toString()
-                );
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Reservation cancelled successfully."
-                );
-
-                reservedUnit = null;
-
-            } else {
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Unable to cancel reservation."
-                );
-            }
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Reservation cancellation will be connected to the database during final integration."
+            );
         });
     }
 
