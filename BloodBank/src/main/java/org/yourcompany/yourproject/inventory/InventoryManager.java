@@ -1,6 +1,6 @@
-import com.bloodbank.common.DatabaseConnection;
 package org.yourcompany.yourproject.inventory;
 
+import com.bloodbank.common.DatabaseConnection;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ public class InventoryManager {
         List<BloodUnit> inventoryList = new ArrayList<>();
         try (Connection con = DatabaseConnection.getConnection();
              Statement stmt = con.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM BloodUnit")) {
+             ResultSet rs = stmt.executeQuery("SELECT * FROM blood_inventory")) {
             while (rs.next()) {
                int unitId = rs.getInt("unitId");
                BloodGroup bloodGroup = BloodGroup.valueOf(rs.getString("blood_group"));
@@ -19,7 +19,7 @@ public class InventoryManager {
                String donorPhone = rs.getString("donor_phone");
                LocalDate collectionDate = rs.getDate("collection_date").toLocalDate();
                BloodStatus status = BloodStatus.valueOf(rs.getString("status"));
-               BloodUnit unit = new BloodUnit(unitId, bloodComponent, donorPhone, collectionDate, status);
+               BloodUnit unit = new BloodUnit(unitId, bloodGroup, bloodComponent, donorPhone, collectionDate, status);
                inventoryList.add(unit);
             }
         } catch (SQLException e) {
