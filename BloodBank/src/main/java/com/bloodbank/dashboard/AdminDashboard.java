@@ -58,9 +58,12 @@ public class AdminDashboard extends JPanel {
 
         JButton donationButton =
                 new JButton("Donations");
+        JButton requestButton =
+                new JButton("Requests");
 
         buttonPanel.add(inventoryButton);
         buttonPanel.add(donationButton);
+        buttonPanel.add(requestButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
 
@@ -70,6 +73,9 @@ public class AdminDashboard extends JPanel {
 
         donationButton.addActionListener(e ->
                 mainFrame.showScreen("DONATIONS")
+        );
+        requestButton.addActionListener(e ->
+        mainFrame.showScreen("ADMIN_REQUESTS")
         );
     }
 }

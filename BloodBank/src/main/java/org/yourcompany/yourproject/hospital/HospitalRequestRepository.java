@@ -8,9 +8,9 @@ public interface HospitalRequestRepository {
 
     List<HospitalRequest> findAll();
 
-    HospitalRequest findById(String requestId);
+    HospitalRequest findById(int requestId);
 
     void update(HospitalRequest request);
 
-    void delete(String requestId);
+    void delete(int requestId);
 }
