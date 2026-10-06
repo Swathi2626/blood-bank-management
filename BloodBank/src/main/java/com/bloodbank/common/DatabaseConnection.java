@@ -8,7 +8,7 @@ public class DatabaseConnection{
 
     private static final String URL = "jdbc:mysql://localhost:3306/blood_bank_db";
     private static final String USER = "root";
-    private static final String PASSWORD = "password"; //replace this field with your password, but don't commit it
+   private static final String PASSWORD = "root123";
 
     public static Connection getConnection() throws SQLException{
         try{

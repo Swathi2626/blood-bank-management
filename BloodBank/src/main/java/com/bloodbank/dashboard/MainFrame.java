@@ -1,7 +1,7 @@
 package com.bloodbank.dashboard;
 
 import com.bloodbank.auth.AuthenticationService;
-import com.bloodbank.auth.InMemoryUserRepository;
+import com.bloodbank.auth.MySQLUserRepository;
 import com.bloodbank.auth.LoginPanel;
 import com.bloodbank.auth.User;
 import com.bloodbank.common.Role;
@@ -32,8 +32,8 @@ public class MainFrame extends JFrame {
         mainPanel = new JPanel(cardLayout);
 
         // Create user repository
-        InMemoryUserRepository userRepository =
-                new InMemoryUserRepository();
+       MySQLUserRepository userRepository =
+        new MySQLUserRepository();
 
         // Create authentication service
         AuthenticationService authenticationService =
