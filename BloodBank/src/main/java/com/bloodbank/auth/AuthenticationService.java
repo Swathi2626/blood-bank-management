@@ -1,10 +1,12 @@
 package com.bloodbank.auth;
 
+import com.bloodbank.common.Repository;
+
 public class AuthenticationService {
 
-    private InMemoryUserRepository userRepository;
+    private Repository<User, String> userRepository;
 
-    public AuthenticationService(InMemoryUserRepository userRepository) {
+    public AuthenticationService(Repository<User, String> userRepository) {
         this.userRepository = userRepository;
     }
 
