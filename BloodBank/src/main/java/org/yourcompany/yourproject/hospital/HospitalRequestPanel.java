@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class HospitalRequestPanel extends JFrame {
+public class HospitalRequestPanel extends JPanel {
 
     private HospitalRequestRepository repository;
     private DefaultTableModel tableModel;
@@ -12,69 +12,102 @@ public class HospitalRequestPanel extends JFrame {
 
     public HospitalRequestPanel() {
 
-        repository = HospitalRequestRepositoryProvider.getRepository();
+        repository =
+                HospitalRequestRepositoryProvider.getRepository();
 
-        setTitle("Hospital Side - Blood Bank Management System");
-        setSize(800, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setLayout(new BorderLayout(10, 10));
 
+        JLabel title =
+                new JLabel("Hospital Blood Request");
 
-        JLabel title = new JLabel("Hospital Blood Request");
+        title.setFont(
+                new Font("Arial", Font.BOLD, 24)
+        );
 
-        title.setFont(new Font("Arial", Font.BOLD, 24));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setHorizontalAlignment(
+                SwingConstants.CENTER
+        );
 
         add(title, BorderLayout.NORTH);
 
-        JPanel formPanel = new JPanel(
-                new GridLayout(5, 2, 10, 10)
-        );
+        JPanel formPanel =
+                new JPanel(
+                        new GridLayout(5, 2, 10, 10)
+                );
 
-        JLabel hospitalLabel = new JLabel("Hospital Name:");
-        JTextField hospitalField = new JTextField();
+        // Hospital Name
+        JLabel hospitalLabel =
+                new JLabel("Hospital Name:");
 
-        JLabel patientLabel = new JLabel("Patient Name:");
-        JTextField patientField = new JTextField();
+        JTextField hospitalField =
+                new JTextField();
 
-        JLabel bloodLabel = new JLabel("Blood Group:");
+        // Blood Group
+        JLabel bloodLabel =
+                new JLabel("Blood Group:");
 
         String[] bloodGroups = {
-                "A+", "A-", "B+", "B-",
-                "AB+", "AB-", "O+", "O-"
+                "A_POSITIVE",
+                "A_NEGATIVE",
+                "B_POSITIVE",
+                "B_NEGATIVE",
+                "AB_POSITIVE",
+                "AB_NEGATIVE",
+                "O_POSITIVE",
+                "O_NEGATIVE"
         };
 
         JComboBox<String> bloodGroupBox =
                 new JComboBox<>(bloodGroups);
 
-        JLabel unitsLabel = new JLabel("Units Required:");
-        JTextField unitsField = new JTextField();
+        // Component
+        JLabel componentLabel =
+                new JLabel("Component:");
 
-        JLabel urgencyLabel = new JLabel("Urgency:");
+        String[] components = {
+                "WHOLE_BLOOD",
+                "PRBC",
+                "PLATELETS",
+                "FPP"
+        };
+
+        JComboBox<String> componentBox =
+                new JComboBox<>(components);
+
+        // Units
+        JLabel unitsLabel =
+                new JLabel("Units Required:");
+
+        JTextField unitsField =
+                new JTextField();
+
+        // Urgency
+        JLabel urgencyLabel =
+                new JLabel("Urgency:");
 
         String[] urgencyOptions = {
-                "Normal", "Urgent", "Emergency"
+                "Normal",
+                "Urgent",
+                "Emergency"
         };
 
         JComboBox<String> urgencyBox =
                 new JComboBox<>(urgencyOptions);
 
-
         formPanel.add(hospitalLabel);
         formPanel.add(hospitalField);
 
-        formPanel.add(patientLabel);
-        formPanel.add(patientField);
-
         formPanel.add(bloodLabel);
         formPanel.add(bloodGroupBox);
+
+        formPanel.add(componentLabel);
+        formPanel.add(componentBox);
 
         formPanel.add(unitsLabel);
         formPanel.add(unitsField);
 
         formPanel.add(urgencyLabel);
         formPanel.add(urgencyBox);
-
 
         JButton submitButton =
                 new JButton("Submit Request");
@@ -85,23 +118,22 @@ public class HospitalRequestPanel extends JFrame {
         submitButton.addActionListener(e -> {
 
             String hospitalName =
-                    hospitalField.getText();
-
-            String patientName =
-                    patientField.getText();
+                    hospitalField.getText().trim();
 
             String bloodGroup =
                     (String) bloodGroupBox.getSelectedItem();
 
+            String component =
+                    (String) componentBox.getSelectedItem();
+
             String units =
-                    unitsField.getText();
+                    unitsField.getText().trim();
 
             String urgency =
                     (String) urgencyBox.getSelectedItem();
 
-
             // Validate hospital name
-            if (hospitalName.trim().isEmpty()) {
+            if (hospitalName.isEmpty()) {
 
                 JOptionPane.showMessageDialog(
                         this,
@@ -111,16 +143,8 @@ public class HospitalRequestPanel extends JFrame {
                 return;
             }
 
-            if (patientName.trim().isEmpty()) {
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Please enter the patient name."
-                );
-
-                return;
-            }
-            if (units.trim().isEmpty()) {
+            // Validate units
+            if (units.isEmpty()) {
 
                 JOptionPane.showMessageDialog(
                         this,
@@ -129,7 +153,6 @@ public class HospitalRequestPanel extends JFrame {
 
                 return;
             }
-
 
             int unitCount;
 
@@ -148,7 +171,6 @@ public class HospitalRequestPanel extends JFrame {
                 return;
             }
 
-
             if (unitCount <= 0) {
 
                 JOptionPane.showMessageDialog(
@@ -159,65 +181,54 @@ public class HospitalRequestPanel extends JFrame {
                 return;
             }
 
-            String requestId =
-                    "R" + (tableModel.getRowCount() + 1);
-
-
-            // Create request
+            /*
+             * requestId is 0 here because MySQL
+             * generates the actual ID using
+             * AUTO_INCREMENT.
+             */
             HospitalRequest request =
                     new HospitalRequest(
-                            requestId,
+                            0,
                             hospitalName,
-                            patientName,
                             bloodGroup,
+                            component,
                             unitCount,
                             urgency
                     );
 
-
-            // Save request
             repository.save(request);
 
-
-            // Add request to table
-            tableModel.addRow(
-                    new Object[]{
-                            requestId,
-                            hospitalName,
-                            patientName,
-                            bloodGroup,
-                            unitCount,
-                            urgency,
-                            "Pending"
-                    }
-            );
-
+            // Reload from database so that the
+            // generated request ID is displayed.
+            loadRequests();
 
             JOptionPane.showMessageDialog(
                     this,
                     "Request submitted successfully!"
             );
 
-
-            // Clear form after submission
-            hospitalField.setText("");
-            patientField.setText("");
-            unitsField.setText("");
-            bloodGroupBox.setSelectedIndex(0);
-            urgencyBox.setSelectedIndex(0);
+            clearForm(
+                    hospitalField,
+                    unitsField,
+                    bloodGroupBox,
+                    componentBox,
+                    urgencyBox
+            );
         });
 
         clearButton.addActionListener(e -> {
 
-            hospitalField.setText("");
-            patientField.setText("");
-            unitsField.setText("");
-
-            bloodGroupBox.setSelectedIndex(0);
-            urgencyBox.setSelectedIndex(0);
+            clearForm(
+                    hospitalField,
+                    unitsField,
+                    bloodGroupBox,
+                    componentBox,
+                    urgencyBox
+            );
         });
 
-        JPanel bottomPanel = new JPanel();
+        JPanel bottomPanel =
+                new JPanel();
 
         bottomPanel.add(submitButton);
         bottomPanel.add(clearButton);
@@ -225,21 +236,21 @@ public class HospitalRequestPanel extends JFrame {
         String[] columns = {
                 "ID",
                 "Hospital",
-                "Patient",
                 "Blood Group",
+                "Component",
                 "Units",
                 "Urgency",
                 "Status"
         };
 
-
         tableModel =
-                new DefaultTableModel(columns, 0);
-
+                new DefaultTableModel(
+                        columns,
+                        0
+                );
 
         requestTable =
                 new JTable(tableModel);
-
 
         JScrollPane tableScrollPane =
                 new JScrollPane(requestTable);
@@ -249,16 +260,14 @@ public class HospitalRequestPanel extends JFrame {
                         new BorderLayout(20, 20)
                 );
 
-
         centerPanel.setBorder(
                 BorderFactory.createEmptyBorder(
                         30,
-                        100,
+                        50,
                         30,
-                        100
+                        50
                 )
         );
-
 
         centerPanel.add(
                 formPanel,
@@ -275,15 +284,50 @@ public class HospitalRequestPanel extends JFrame {
                 BorderLayout.SOUTH
         );
 
-
         add(
                 centerPanel,
                 BorderLayout.CENTER
         );
+
+        // Load existing requests from MySQL
+        loadRequests();
     }
-    public static void main(String[] args) {
 
-        new HospitalRequestPanel().setVisible(true);
 
+    private void loadRequests() {
+
+        tableModel.setRowCount(0);
+
+        for (HospitalRequest request :
+                repository.findAll()) {
+
+            tableModel.addRow(
+                    new Object[]{
+                            request.getRequestId(),
+                            request.getHospitalName(),
+                            request.getBloodGroup(),
+                            request.getComponent(),
+                            request.getUnitsRequired(),
+                            request.getUrgency(),
+                            request.getStatus()
+                    }
+            );
+        }
+    }
+
+
+    private void clearForm(
+            JTextField hospitalField,
+            JTextField unitsField,
+            JComboBox<String> bloodGroupBox,
+            JComboBox<String> componentBox,
+            JComboBox<String> urgencyBox) {
+
+        hospitalField.setText("");
+        unitsField.setText("");
+
+        bloodGroupBox.setSelectedIndex(0);
+        componentBox.setSelectedIndex(0);
+        urgencyBox.setSelectedIndex(0);
     }
 }

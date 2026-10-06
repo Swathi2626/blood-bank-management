@@ -2,28 +2,32 @@ package org.yourcompany.yourproject.hospital;
 
 public class HospitalRequest {
 
-    private String requestId;
+    private int requestId;
     private String hospitalName;
-    private String patientName;
     private String bloodGroup;
+    private String component;
     private int unitsRequired;
     private String urgency;
     private String status;
 
-    public HospitalRequest(String requestId, String hospitalName,
-                           String patientName, String bloodGroup,
-                           int unitsRequired, String urgency) {
+    public HospitalRequest(
+            int requestId,
+            String hospitalName,
+            String bloodGroup,
+            String component,
+            int unitsRequired,
+            String urgency) {
 
         this.requestId = requestId;
         this.hospitalName = hospitalName;
-        this.patientName = patientName;
         this.bloodGroup = bloodGroup;
+        this.component = component;
         this.unitsRequired = unitsRequired;
         this.urgency = urgency;
-        this.status = "Pending";
+        this.status = "PENDING";
     }
 
-    public String getRequestId() {
+    public int getRequestId() {
         return requestId;
     }
 
@@ -31,12 +35,12 @@ public class HospitalRequest {
         return hospitalName;
     }
 
-    public String getPatientName() {
-        return patientName;
-    }
-
     public String getBloodGroup() {
         return bloodGroup;
+    }
+
+    public String getComponent() {
+        return component;
     }
 
     public int getUnitsRequired() {

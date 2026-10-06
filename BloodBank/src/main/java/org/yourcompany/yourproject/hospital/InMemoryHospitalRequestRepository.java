@@ -19,19 +19,26 @@ public class InMemoryHospitalRequestRepository
     }
 
     @Override
-    public HospitalRequest findById(String requestId) {
+    public HospitalRequest findById(int requestId) {
+
         for (HospitalRequest request : requests) {
-            if (request.getRequestId().equals(requestId)) {
+
+            if (request.getRequestId() == requestId) {
                 return request;
             }
         }
+
         return null;
     }
 
     @Override
     public void update(HospitalRequest request) {
+
         for (int i = 0; i < requests.size(); i++) {
-            if (requests.get(i).getRequestId().equals(request.getRequestId())) {
+
+            if (requests.get(i).getRequestId()
+                    == request.getRequestId()) {
+
                 requests.set(i, request);
                 return;
             }
@@ -39,9 +46,10 @@ public class InMemoryHospitalRequestRepository
     }
 
     @Override
-    public void delete(String requestId) {
+    public void delete(int requestId) {
+
         requests.removeIf(
-            request -> request.getRequestId().equals(requestId)
+                request -> request.getRequestId() == requestId
         );
     }
 }
