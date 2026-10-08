@@ -1,5 +1,8 @@
 package org.yourcompany.yourproject.hospital;
 
+import com.bloodbank.dashboard.DashboardTheme;
+import com.bloodbank.dashboard.MainFrame;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -9,26 +12,28 @@ public class HospitalRequestPanel extends JPanel {
     private HospitalRequestRepository repository;
     private DefaultTableModel tableModel;
     private JTable requestTable;
+    private final MainFrame mainFrame;
 
-    public HospitalRequestPanel() {
+    public HospitalRequestPanel(MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
 
         repository =
                 HospitalRequestRepositoryProvider.getRepository();
 
         setLayout(new BorderLayout(10, 10));
 
-        JLabel title =
-                new JLabel("Hospital Blood Request");
+        JPanel titleBar = new JPanel(new BorderLayout());
+        titleBar.setOpaque(false);
+        JLabel title = new JLabel("Hospital Blood Request");
+        title.setFont(new Font("Arial", Font.BOLD, 24));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
 
-        title.setFont(
-                new Font("Arial", Font.BOLD, 24)
-        );
+        JButton backButton = DashboardTheme.createSecondaryButton("Back");
+        backButton.addActionListener(e -> mainFrame.goBackToDashboard());
 
-        title.setHorizontalAlignment(
-                SwingConstants.CENTER
-        );
-
-        add(title, BorderLayout.NORTH);
+        titleBar.add(title, BorderLayout.CENTER);
+        titleBar.add(backButton, BorderLayout.EAST);
+        add(titleBar, BorderLayout.NORTH);
 
         JPanel formPanel =
                 new JPanel(

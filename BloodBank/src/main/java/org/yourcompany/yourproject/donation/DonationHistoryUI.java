@@ -1,4 +1,4 @@
-package org.yourcompany.yourproject;
+package org.yourcompany.yourproject.donation;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

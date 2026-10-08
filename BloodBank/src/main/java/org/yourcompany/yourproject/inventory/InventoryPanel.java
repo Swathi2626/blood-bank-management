@@ -1,10 +1,17 @@
 package org.yourcompany.yourproject.inventory;
 
+import com.bloodbank.dashboard.DashboardTheme;
+import com.bloodbank.dashboard.MainFrame;
+
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -13,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 public class InventoryPanel extends JPanel {
@@ -23,34 +31,65 @@ public class InventoryPanel extends JPanel {
     private final JComboBox<BloodComponent> componentCombo;
     private final JTextField phone;
     private final JTextField collectionDateField;
+    private final MainFrame mainFrame;
 
-    public InventoryPanel() {
+    public InventoryPanel(MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
         inventoryManager = new InventoryManager();
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(16, 16));
+        setBorder(new EmptyBorder(20, 20, 20, 20));
+        setBackground(DashboardTheme.BACKGROUND);
+
+        JPanel titleBar = new JPanel(new BorderLayout());
+        titleBar.setOpaque(false);
+        JLabel title = DashboardTheme.createSectionTitle("Inventory Management");
+        JButton backButton = DashboardTheme.createSecondaryButton("Back");
+        backButton.addActionListener(e -> mainFrame.goBackToDashboard());
+        titleBar.add(title, BorderLayout.WEST);
+        titleBar.add(backButton, BorderLayout.EAST);
+        add(titleBar, BorderLayout.NORTH);
 
         String[] columns = {"Unit ID", "Blood Group", "Blood Component", "Donor Phone", "Collection Date", "Expiration Date", "Status"};
         tableModel = new DefaultTableModel(columns, 0);
         table = new JTable(tableModel);
-        add(new JScrollPane(table), BorderLayout.CENTER);
+        table.setFillsViewportHeight(true);
+        table.setRowHeight(32);
+        table.setGridColor(new Color(230, 234, 239));
+        table.setSelectionBackground(DashboardTheme.BLOOD_RED);
+        table.setSelectionForeground(Color.WHITE);
 
-        JPanel formPanel = new JPanel(new FlowLayout());
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        add(scrollPane, BorderLayout.CENTER);
+
+        JPanel formPanel = new JPanel(new GridLayout(2, 5, 8, 8));
+        formPanel.setOpaque(false);
+        formPanel.setBorder(BorderFactory.createCompoundBorder(
+                new DashboardTheme.RoundedBorder(new Color(226, 232, 238), 18),
+                new EmptyBorder(12, 12, 12, 12)
+        ));
+
         bloodGroupCombo = new JComboBox<>(BloodGroup.values());
         componentCombo = new JComboBox<>(BloodComponent.values());
-        phone = new JTextField(12);
-        collectionDateField = new JTextField(LocalDate.now().toString(), 10);
-        JButton addButton = new JButton("Add Blood Unit");
+        phone = new JTextField();
+        collectionDateField = new JTextField(LocalDate.now().toString());
+
+        JButton addButton = DashboardTheme.createActionButton("Add Blood Unit");
 
         formPanel.add(new JLabel("Group:"));
-        formPanel.add(bloodGroupCombo);
         formPanel.add(new JLabel("Component:"));
-        formPanel.add(componentCombo);
-        formPanel.add(new JLabel("Donor phone:"));
-        formPanel.add(phone);
+        formPanel.add(new JLabel("Donor Phone:"));
         formPanel.add(new JLabel("Collected:"));
+        formPanel.add(new JLabel(""));
+
+        formPanel.add(bloodGroupCombo);
+        formPanel.add(componentCombo);
+        formPanel.add(phone);
         formPanel.add(collectionDateField);
         formPanel.add(addButton);
-        add(formPanel, BorderLayout.SOUTH);
 
+        formPanel.setPreferredSize(new Dimension(800, 120));
+        add(formPanel, BorderLayout.SOUTH);
         addButton.addActionListener(event -> addUnitAction());
         refreshTable();
     }
