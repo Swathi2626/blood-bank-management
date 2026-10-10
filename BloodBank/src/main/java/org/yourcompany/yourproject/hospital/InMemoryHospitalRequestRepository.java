@@ -2,6 +2,7 @@ package org.yourcompany.yourproject.hospital;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class InMemoryHospitalRequestRepository
         implements HospitalRequestRepository {
@@ -52,4 +53,11 @@ public class InMemoryHospitalRequestRepository
                 request -> request.getRequestId() == requestId
         );
     }
+    @Override
+    public List<HospitalRequest> findByHospitalName(String hospitalName) {
+        return findAll().stream()
+                .filter(request ->
+                        request.getHospitalName().equals(hospitalName))
+                .collect(Collectors.toList());
+}
 }

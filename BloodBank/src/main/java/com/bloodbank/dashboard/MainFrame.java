@@ -18,6 +18,7 @@ public class MainFrame extends JFrame {
     private final JPanel mainPanel;
     private final LoginPanel loginPanel;
     private String currentDashboardKey;
+    private User currentUser;
 
     public MainFrame() {
         DashboardTheme.apply();
@@ -40,7 +41,6 @@ public class MainFrame extends JFrame {
         mainPanel.add(loginPanel, "LOGIN");
         mainPanel.add(new InventoryPanel(this), "INVENTORY");
         mainPanel.add(new PlaceholderPanel("Donations — Coming Soon"), "DONATIONS");
-        mainPanel.add(new HospitalRequestPanel(this), "REQUESTS");
         mainPanel.add(new AdminRequestPanel(this), "ADMIN_REQUESTS");
 
         add(mainPanel);
@@ -50,6 +50,7 @@ public class MainFrame extends JFrame {
     }
 
     public void showDashboard(User user) {
+        currentUser = user;
         if (user.getRole() == Role.ADMIN) {
             currentDashboardKey = "ADMIN";
             AdminDashboard dashboard = new AdminDashboard(this);
@@ -77,13 +78,25 @@ public class MainFrame extends JFrame {
     public void showScreen(String screenName) {
         cardLayout.show(mainPanel, screenName);
     }
+    public void showHospitalRequests() {
+    HospitalRequestPanel requestPanel =
+            new HospitalRequestPanel(this);
+
+    mainPanel.add(requestPanel, "REQUESTS");
+    cardLayout.show(mainPanel, "REQUESTS");
+
+    mainPanel.revalidate();
+    mainPanel.repaint();
+}
 
     public void showLogin() {
         currentDashboardKey = null;
         loginPanel.clearFields();
         cardLayout.show(mainPanel, "LOGIN");
     }
-
+    public User getCurrentUser() {
+    return currentUser;
+    }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(MainFrame::new);
     }

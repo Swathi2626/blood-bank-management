@@ -91,6 +91,36 @@ public class JdbcHospitalRequestRepository
 
         return requests;
     }
+    
+@Override
+public List<HospitalRequest> findByHospitalName(String hospitalName) {
+
+    List<HospitalRequest> requests = new ArrayList<>();
+
+    String sql =
+            "SELECT * FROM hospital_requests " +
+            "WHERE hospital_name = ?";
+
+    try (Connection connection = DatabaseConnection.getConnection();
+         PreparedStatement statement = connection.prepareStatement(sql)) {
+
+        statement.setString(1, hospitalName);
+
+        try (ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                HospitalRequest request =
+                        createRequestFromResultSet(resultSet);
+
+                requests.add(request);
+            }
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return requests;
+}
 
 
     @Override

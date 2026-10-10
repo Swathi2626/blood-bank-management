@@ -7,6 +7,7 @@ public interface HospitalRequestRepository {
     void save(HospitalRequest request);
 
     List<HospitalRequest> findAll();
+    List<HospitalRequest> findByHospitalName(String hospitalName);
 
     HospitalRequest findById(int requestId);
 
