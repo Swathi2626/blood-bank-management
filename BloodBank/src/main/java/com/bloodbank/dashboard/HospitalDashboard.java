@@ -37,7 +37,7 @@ public class HospitalDashboard extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
 
         inventoryButton.addActionListener(e -> mainFrame.showScreen("INVENTORY"));
-        requestButton.addActionListener(e -> mainFrame.showScreen("REQUESTS"));
+        requestButton.addActionListener(e -> mainFrame.showHospitalRequests());
         logoutButton.addActionListener(e -> mainFrame.showLogin());
     }
 }
