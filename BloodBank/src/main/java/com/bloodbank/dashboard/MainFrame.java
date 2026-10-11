@@ -5,9 +5,13 @@ import com.bloodbank.auth.LoginPanel;
 import com.bloodbank.auth.MySQLUserRepository;
 import com.bloodbank.auth.User;
 import com.bloodbank.common.Role;
+<<<<<<< HEAD
+import org.yourcompany.yourproject.donation.DonationHistoryUI;
+=======
 import org.yourcompany.yourproject.hospital.AdminRequestPanel;
 import org.yourcompany.yourproject.hospital.HospitalRequestPanel;
 import org.yourcompany.yourproject.inventory.InventoryPanel;
+>>>>>>> main
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,6 +47,28 @@ public class MainFrame extends JFrame {
         mainPanel.add(new PlaceholderPanel("Donations — Coming Soon"), "DONATIONS");
         mainPanel.add(new AdminRequestPanel(this), "ADMIN_REQUESTS");
 
+<<<<<<< HEAD
+        // Add inventory screen
+        mainPanel.add(
+                new PlaceholderPanel("Inventory — Coming Soon"),
+                "INVENTORY"
+        );
+
+        // Add donation history screen
+        mainPanel.add(
+                new DonationHistoryUI(),
+                "DONATIONS"
+        );
+
+        // Add blood request screen
+        mainPanel.add(
+                new PlaceholderPanel("Blood Request — Coming Soon"),
+                "REQUESTS"
+        );
+
+        // Add everything to the JFrame
+=======
+>>>>>>> main
         add(mainPanel);
 
         cardLayout.show(mainPanel, "LOGIN");
