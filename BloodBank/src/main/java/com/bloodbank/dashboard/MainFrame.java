@@ -1,4 +1,3 @@
-
 package com.bloodbank.dashboard;
 
 import com.bloodbank.auth.AuthenticationService;
@@ -6,7 +5,6 @@ import com.bloodbank.auth.LoginPanel;
 import com.bloodbank.auth.MySQLUserRepository;
 import com.bloodbank.auth.User;
 import com.bloodbank.common.Role;
-
 import org.yourcompany.yourproject.donation.DonationHistoryUI;
 import org.yourcompany.yourproject.hospital.AdminRequestPanel;
 import org.yourcompany.yourproject.hospital.HospitalRequestPanel;
@@ -20,6 +18,7 @@ public class MainFrame extends JFrame {
     private final CardLayout cardLayout;
     private final JPanel mainPanel;
     private final LoginPanel loginPanel;
+    private final InventoryPanel inventoryPanel;
 
     private String currentDashboardKey;
     private User currentUser;
@@ -43,9 +42,10 @@ public class MainFrame extends JFrame {
                 new AuthenticationService(userRepository);
 
         loginPanel = new LoginPanel(authenticationService, this);
+        inventoryPanel = new InventoryPanel(this);
 
         mainPanel.add(loginPanel, "LOGIN");
-        mainPanel.add(new InventoryPanel(this), "INVENTORY");
+        mainPanel.add(inventoryPanel, "INVENTORY");
         mainPanel.add(new DonationHistoryUI(), "DONATIONS");
         mainPanel.add(new AdminRequestPanel(this), "ADMIN_REQUESTS");
 
@@ -57,6 +57,7 @@ public class MainFrame extends JFrame {
 
     public void showDashboard(User user) {
         currentUser = user;
+        inventoryPanel.setEditingEnabled(user.getRole() == Role.ADMIN);
 
         if (user.getRole() == Role.ADMIN) {
             currentDashboardKey = "ADMIN";
@@ -84,6 +85,22 @@ public class MainFrame extends JFrame {
     }
 
     public void showScreen(String screenName) {
+        if ("INVENTORY".equals(screenName)) {
+            if (currentUser == null) {
+                return;
+            }
+
+            inventoryPanel.setEditingEnabled(
+                    currentUser.getRole() == Role.ADMIN
+            );
+            inventoryPanel.refreshTable();
+
+        } else if ("ADMIN_REQUESTS".equals(screenName)
+                && (currentUser == null
+                || currentUser.getRole() != Role.ADMIN)) {
+            return;
+        }
+
         cardLayout.show(mainPanel, screenName);
     }
 
@@ -100,6 +117,8 @@ public class MainFrame extends JFrame {
     public void showLogin() {
         currentDashboardKey = null;
         currentUser = null;
+        inventoryPanel.setEditingEnabled(false);
+
         loginPanel.clearFields();
         cardLayout.show(mainPanel, "LOGIN");
     }

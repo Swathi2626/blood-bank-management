@@ -5,21 +5,29 @@ import com.bloodbank.common.Role;
 public class User {
 
     private String username;
-    private String password;
+    private String passwordHash;
     private Role role;
 
     public User(String username, String password, Role role) {
+        this(username, PasswordHasher.hash(password), role, true);
+    }
+
+    private User(String username, String passwordValue, Role role, boolean isHash) {
         this.username = username;
-        this.password = password;
+        this.passwordHash = isHash ? passwordValue : PasswordHasher.hash(passwordValue);
         this.role = role;
+    }
+
+    public static User fromPasswordHash(String username, String passwordHash, Role role) {
+        return new User(username, passwordHash, role, true);
     }
 
     public String getUsername() {
         return username;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
     public Role getRole() {
@@ -27,7 +35,7 @@ public class User {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.passwordHash = PasswordHasher.hash(password);
     }
 
     public void setRole(Role role) {

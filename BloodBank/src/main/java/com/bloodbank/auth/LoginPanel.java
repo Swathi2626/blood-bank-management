@@ -8,14 +8,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 public class LoginPanel extends JPanel {
 
     private final JTextField usernameField;
     private final JPasswordField passwordField;
-    private final JLabel passwordFeedbackLabel;
     private final JButton loginButton;
 
     private final AuthenticationService authenticationService;
@@ -113,18 +111,11 @@ public class LoginPanel extends JPanel {
         gbc.gridx = 1;
         rightPanel.add(passwordField, gbc);
 
-        passwordFeedbackLabel = new JLabel();
-        passwordFeedbackLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.gridwidth = 2;
-        rightPanel.add(passwordFeedbackLabel, gbc);
-
         loginButton = DashboardTheme.createActionButton("Login");
         loginButton.setPreferredSize(new Dimension(200, 44));
         loginButton.setEnabled(false);
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 4;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         rightPanel.add(loginButton, gbc);
@@ -133,112 +124,54 @@ public class LoginPanel extends JPanel {
         card.add(rightPanel, BorderLayout.CENTER);
         add(card, BorderLayout.CENTER);
 
-        passwordField.getDocument().addDocumentListener(new DocumentListener() {
+        DocumentListener inputListener = new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                updatePasswordFeedback();
+                updateLoginButtonState();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                updatePasswordFeedback();
+                updateLoginButtonState();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                updatePasswordFeedback();
+                updateLoginButtonState();
             }
-        });
-        updatePasswordFeedback();
+        };
+        usernameField.getDocument().addDocumentListener(inputListener);
+        passwordField.getDocument().addDocumentListener(inputListener);
+        updateLoginButtonState();
         loginButton.addActionListener(e -> login());
     }
 
-    private void updatePasswordFeedback() {
+    private void updateLoginButtonState() {
         char[] password = passwordField.getPassword();
         try {
-            List<String> issues = getPasswordIssues(password);
-            if (issues.isEmpty()) {
-                passwordFeedbackLabel.setText("Password meets the requirements.");
-                passwordFeedbackLabel.setForeground(new Color(35, 128, 72));
-                loginButton.setEnabled(true);
-            } else {
-                passwordFeedbackLabel.setText("<html>" + String.join("<br>", issues) + "</html>");
-                passwordFeedbackLabel.setForeground(new Color(168, 22, 35));
-                loginButton.setEnabled(false);
-            }
+            loginButton.setEnabled(!usernameField.getText().isBlank() && password.length > 0);
         } finally {
-            java.util.Arrays.fill(password, '\0');
+            Arrays.fill(password, '\0');
         }
-    }
-
-    private List<String> getPasswordIssues(char[] password) {
-        List<String> issues = new ArrayList<>();
-        boolean hasLetter = false;
-        boolean hasDigit = false;
-        boolean hasSymbol = false;
-
-        if (password.length < 8) {
-            issues.add("Password is too short (minimum 8 characters).");
-        }
-
-        for (int index = 0; index < password.length;) {
-            int codePoint = Character.codePointAt(password, index, password.length);
-            if (Character.isLetter(codePoint)) {
-                hasLetter = true;
-            } else if (Character.isDigit(codePoint)) {
-                hasDigit = true;
-            } else if (isSymbol(codePoint)) {
-                hasSymbol = true;
-            }
-            index += Character.charCount(codePoint);
-        }
-
-        if (!hasLetter) {
-            issues.add("Include at least one letter.");
-        }
-        if (!hasDigit) {
-            issues.add("Include at least one number.");
-        }
-        if (!hasSymbol) {
-            issues.add("Include at least one symbol (for example, !, @, or #).");
-        }
-
-        return issues;
-    }
-
-    private boolean isSymbol(int codePoint) {
-        return switch (Character.getType(codePoint)) {
-            case Character.CONNECTOR_PUNCTUATION,
-                    Character.DASH_PUNCTUATION,
-                    Character.START_PUNCTUATION,
-                    Character.END_PUNCTUATION,
-                    Character.OTHER_PUNCTUATION,
-                    Character.INITIAL_QUOTE_PUNCTUATION,
-                    Character.FINAL_QUOTE_PUNCTUATION,
-                    Character.MATH_SYMBOL,
-                    Character.CURRENCY_SYMBOL,
-                    Character.MODIFIER_SYMBOL,
-                    Character.OTHER_SYMBOL -> true;
-            default -> false;
-        };
     }
 
     private void login() {
-        updatePasswordFeedback();
         if (!loginButton.isEnabled()) {
             return;
         }
 
-        String username = usernameField.getText();
-        String password = new String(passwordField.getPassword());
+        char[] password = passwordField.getPassword();
+        try {
+            User user = authenticationService.login(usernameField.getText().trim(), password);
 
-        User user = authenticationService.login(username, password);
-
-        if (user != null) {
-            JOptionPane.showMessageDialog(this, "Login successful!\nWelcome " + user.getUsername());
-            mainFrame.showDashboard(user);
-        } else {
-            JOptionPane.showMessageDialog(this, "Invalid username or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+            if (user != null) {
+                JOptionPane.showMessageDialog(this, "Login successful!\nWelcome " + user.getUsername());
+                mainFrame.showDashboard(user);
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid username or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+            }
+        } finally {
+            Arrays.fill(password, '\0');
         }
     }
 
