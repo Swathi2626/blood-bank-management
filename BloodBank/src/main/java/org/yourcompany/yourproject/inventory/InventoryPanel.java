@@ -2,6 +2,7 @@ package org.yourcompany.yourproject.inventory;
 
 import com.bloodbank.dashboard.DashboardTheme;
 import com.bloodbank.dashboard.MainFrame;
+import com.bloodbank.common.Role;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -32,6 +33,7 @@ public class InventoryPanel extends JPanel {
     private final JTextField phone;
     private final JTextField collectionDateField;
     private final MainFrame mainFrame;
+    private final JPanel formPanel;
 
     public InventoryPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
@@ -62,7 +64,7 @@ public class InventoryPanel extends JPanel {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         add(scrollPane, BorderLayout.CENTER);
 
-        JPanel formPanel = new JPanel(new GridLayout(2, 5, 8, 8));
+        formPanel = new JPanel(new GridLayout(2, 5, 8, 8));
         formPanel.setOpaque(false);
         formPanel.setBorder(BorderFactory.createCompoundBorder(
                 new DashboardTheme.RoundedBorder(new Color(226, 232, 238), 18),
@@ -91,10 +93,17 @@ public class InventoryPanel extends JPanel {
         formPanel.setPreferredSize(new Dimension(800, 120));
         add(formPanel, BorderLayout.SOUTH);
         addButton.addActionListener(event -> addUnitAction());
+        setEditingEnabled(false);
         refreshTable();
     }
 
-    private void refreshTable() {
+    public void setEditingEnabled(boolean enabled) {
+        formPanel.setVisible(enabled);
+        revalidate();
+        repaint();
+    }
+
+    public void refreshTable() {
         tableModel.setRowCount(0);
         List<BloodUnit> units = inventoryManager.getAllBloodUnits();
         for (BloodUnit unit : units) {
@@ -112,6 +121,11 @@ public class InventoryPanel extends JPanel {
     }
 
     private void addUnitAction() {
+        if (mainFrame.getCurrentUser() == null
+                || mainFrame.getCurrentUser().getRole() != Role.ADMIN) {
+            return;
+        }
+
         try {
             BloodGroup bloodGroup = (BloodGroup) bloodGroupCombo.getSelectedItem();
             BloodComponent component = (BloodComponent) componentCombo.getSelectedItem();

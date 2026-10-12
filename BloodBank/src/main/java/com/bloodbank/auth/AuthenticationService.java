@@ -10,11 +10,14 @@ public class AuthenticationService {
         this.userRepository = userRepository;
     }
 
-    public User login(String username, String password) {
+    public User login(String username, char[] password) {
+        if (username == null || username.isBlank() || password == null || password.length == 0) {
+            return null;
+        }
 
-        User user = userRepository.findById(username);
+        User user = userRepository.findById(username.trim());
 
-        if (user != null && user.getPassword().equals(password)) {
+        if (user != null && PasswordHasher.matches(password, user.getPasswordHash())) {
             return user;
         }
 
