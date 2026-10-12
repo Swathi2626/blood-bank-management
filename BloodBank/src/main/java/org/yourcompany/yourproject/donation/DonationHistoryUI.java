@@ -4,17 +4,13 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class DonationHistoryUI extends JFrame {
+public class DonationHistoryUI extends JPanel {
 
     private DefaultTableModel tableModel;
     private JTable donationTable;
 
     public DonationHistoryUI() {
-
-        setTitle("Donation History");
-        setSize(800, 500);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
 
         JLabel titleLabel = new JLabel("Donation History");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
@@ -106,10 +102,4 @@ public class DonationHistoryUI extends JFrame {
         });
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            DonationHistoryUI ui = new DonationHistoryUI();
-            ui.setVisible(true);
-        });
-    }
 }
