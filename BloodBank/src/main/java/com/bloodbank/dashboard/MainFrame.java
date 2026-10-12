@@ -18,6 +18,7 @@ public class MainFrame extends JFrame {
     private final CardLayout cardLayout;
     private final JPanel mainPanel;
     private final LoginPanel loginPanel;
+    private final InventoryPanel inventoryPanel;
     private String currentDashboardKey;
     private User currentUser;
 
@@ -40,7 +41,8 @@ public class MainFrame extends JFrame {
 
         loginPanel = new LoginPanel(authenticationService, this);
         mainPanel.add(loginPanel, "LOGIN");
-        mainPanel.add(new InventoryPanel(this), "INVENTORY");
+        inventoryPanel = new InventoryPanel(this);
+        mainPanel.add(inventoryPanel, "INVENTORY");
         mainPanel.add(new DonationHistoryUI(), "DONATIONS");
         mainPanel.add(new AdminRequestPanel(this), "ADMIN_REQUESTS");
         // Add blood request screen
@@ -58,6 +60,7 @@ public class MainFrame extends JFrame {
 
     public void showDashboard(User user) {
         currentUser = user;
+        inventoryPanel.setEditingEnabled(user.getRole() == Role.ADMIN);
         if (user.getRole() == Role.ADMIN) {
             currentDashboardKey = "ADMIN";
             AdminDashboard dashboard = new AdminDashboard(this);
@@ -83,6 +86,16 @@ public class MainFrame extends JFrame {
     }
 
     public void showScreen(String screenName) {
+        if ("INVENTORY".equals(screenName)) {
+            if (currentUser == null) {
+                return;
+            }
+            inventoryPanel.setEditingEnabled(currentUser.getRole() == Role.ADMIN);
+            inventoryPanel.refreshTable();
+        } else if ("ADMIN_REQUESTS".equals(screenName)
+                && (currentUser == null || currentUser.getRole() != Role.ADMIN)) {
+            return;
+        }
         cardLayout.show(mainPanel, screenName);
     }
     public void showHospitalRequests() {
@@ -98,6 +111,8 @@ public class MainFrame extends JFrame {
 
     public void showLogin() {
         currentDashboardKey = null;
+        currentUser = null;
+        inventoryPanel.setEditingEnabled(false);
         loginPanel.clearFields();
         cardLayout.show(mainPanel, "LOGIN");
     }
