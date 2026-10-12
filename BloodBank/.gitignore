@@ -1,1 +1,18 @@
+# Maven build output
 target/
+
+# IDE metadata and workspace settings
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+.metadata/
+nbproject/private/
+
+# Local build output and operating-system files
+build/
+out/
+.DS_Store
+Thumbs.db

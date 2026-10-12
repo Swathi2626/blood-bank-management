@@ -4,6 +4,10 @@
 
 package org.yourcompany.yourproject;
 
+import com.bloodbank.dashboard.MainFrame;
+
+import javax.swing.SwingUtilities;
+
 /**
  *
  * @author Admin
@@ -11,6 +15,6 @@ package org.yourcompany.yourproject;
 public class BloodBank {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        SwingUtilities.invokeLater(MainFrame::new);
     }
 }
