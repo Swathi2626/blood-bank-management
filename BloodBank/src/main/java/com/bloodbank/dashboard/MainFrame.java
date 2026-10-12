@@ -1,3 +1,4 @@
+
 package com.bloodbank.dashboard;
 
 import com.bloodbank.auth.AuthenticationService;
@@ -5,13 +6,11 @@ import com.bloodbank.auth.LoginPanel;
 import com.bloodbank.auth.MySQLUserRepository;
 import com.bloodbank.auth.User;
 import com.bloodbank.common.Role;
-<<<<<<< HEAD
+
 import org.yourcompany.yourproject.donation.DonationHistoryUI;
-=======
 import org.yourcompany.yourproject.hospital.AdminRequestPanel;
 import org.yourcompany.yourproject.hospital.HospitalRequestPanel;
 import org.yourcompany.yourproject.inventory.InventoryPanel;
->>>>>>> main
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,6 +20,7 @@ public class MainFrame extends JFrame {
     private final CardLayout cardLayout;
     private final JPanel mainPanel;
     private final LoginPanel loginPanel;
+
     private String currentDashboardKey;
     private User currentUser;
 
@@ -39,36 +39,16 @@ public class MainFrame extends JFrame {
         mainPanel.setBackground(DashboardTheme.BACKGROUND);
 
         MySQLUserRepository userRepository = new MySQLUserRepository();
-        AuthenticationService authenticationService = new AuthenticationService(userRepository);
+        AuthenticationService authenticationService =
+                new AuthenticationService(userRepository);
 
         loginPanel = new LoginPanel(authenticationService, this);
+
         mainPanel.add(loginPanel, "LOGIN");
         mainPanel.add(new InventoryPanel(this), "INVENTORY");
-        mainPanel.add(new PlaceholderPanel("Donations — Coming Soon"), "DONATIONS");
+        mainPanel.add(new DonationHistoryUI(), "DONATIONS");
         mainPanel.add(new AdminRequestPanel(this), "ADMIN_REQUESTS");
 
-<<<<<<< HEAD
-        // Add inventory screen
-        mainPanel.add(
-                new PlaceholderPanel("Inventory — Coming Soon"),
-                "INVENTORY"
-        );
-
-        // Add donation history screen
-        mainPanel.add(
-                new DonationHistoryUI(),
-                "DONATIONS"
-        );
-
-        // Add blood request screen
-        mainPanel.add(
-                new PlaceholderPanel("Blood Request — Coming Soon"),
-                "REQUESTS"
-        );
-
-        // Add everything to the JFrame
-=======
->>>>>>> main
         add(mainPanel);
 
         cardLayout.show(mainPanel, "LOGIN");
@@ -77,11 +57,13 @@ public class MainFrame extends JFrame {
 
     public void showDashboard(User user) {
         currentUser = user;
+
         if (user.getRole() == Role.ADMIN) {
             currentDashboardKey = "ADMIN";
             AdminDashboard dashboard = new AdminDashboard(this);
             mainPanel.add(dashboard, "ADMIN");
             cardLayout.show(mainPanel, "ADMIN");
+
         } else if (user.getRole() == Role.HOSPITAL) {
             currentDashboardKey = "HOSPITAL";
             HospitalDashboard dashboard = new HospitalDashboard(this);
@@ -104,25 +86,28 @@ public class MainFrame extends JFrame {
     public void showScreen(String screenName) {
         cardLayout.show(mainPanel, screenName);
     }
+
     public void showHospitalRequests() {
-    HospitalRequestPanel requestPanel =
-            new HospitalRequestPanel(this);
+        HospitalRequestPanel requestPanel = new HospitalRequestPanel(this);
 
-    mainPanel.add(requestPanel, "REQUESTS");
-    cardLayout.show(mainPanel, "REQUESTS");
+        mainPanel.add(requestPanel, "REQUESTS");
+        cardLayout.show(mainPanel, "REQUESTS");
 
-    mainPanel.revalidate();
-    mainPanel.repaint();
-}
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
 
     public void showLogin() {
         currentDashboardKey = null;
+        currentUser = null;
         loginPanel.clearFields();
         cardLayout.show(mainPanel, "LOGIN");
     }
+
     public User getCurrentUser() {
-    return currentUser;
+        return currentUser;
     }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(MainFrame::new);
     }
