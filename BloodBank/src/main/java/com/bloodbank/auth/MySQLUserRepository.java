@@ -18,7 +18,7 @@ public class MySQLUserRepository implements Repository<User, String> {
              PreparedStatement stmt = con.prepareStatement(sql)) {
 
             stmt.setString(1, user.getUsername());
-            stmt.setString(2, user.getPassword());
+            stmt.setString(2, user.getPasswordHash());
             stmt.setString(3, user.getRole().name());
 
             stmt.executeUpdate();
@@ -39,10 +39,10 @@ public class MySQLUserRepository implements Repository<User, String> {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    String password = rs.getString("password");
+                    String passwordHash = rs.getString("password");
                     Role role = Role.valueOf(rs.getString("role"));
 
-                    return new User(username, password, role);
+                    return User.fromPasswordHash(username, passwordHash, role);
                 }
             }
 
@@ -65,10 +65,10 @@ public class MySQLUserRepository implements Repository<User, String> {
 
             while (rs.next()) {
                 String username = rs.getString("username");
-                String password = rs.getString("password");
+                String passwordHash = rs.getString("password");
                 Role role = Role.valueOf(rs.getString("role"));
 
-                users.add(new User(username, password, role));
+                users.add(User.fromPasswordHash(username, passwordHash, role));
             }
 
         } catch (SQLException e) {
@@ -85,7 +85,7 @@ public class MySQLUserRepository implements Repository<User, String> {
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
 
-            stmt.setString(1, user.getPassword());
+            stmt.setString(1, user.getPasswordHash());
             stmt.setString(2, user.getRole().name());
             stmt.setString(3, user.getUsername());
 

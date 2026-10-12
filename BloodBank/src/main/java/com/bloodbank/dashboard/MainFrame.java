@@ -43,7 +43,13 @@ public class MainFrame extends JFrame {
         mainPanel.add(new InventoryPanel(this), "INVENTORY");
         mainPanel.add(new DonationHistoryUI(), "DONATIONS");
         mainPanel.add(new AdminRequestPanel(this), "ADMIN_REQUESTS");
+        // Add blood request screen
+        mainPanel.add(
+                new PlaceholderPanel("Blood Request — Coming Soon"),
+                "REQUESTS"
+        );
 
+        // Add everything to the JFrame
         add(mainPanel);
 
         cardLayout.show(mainPanel, "LOGIN");
